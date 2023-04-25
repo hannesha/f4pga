@@ -199,7 +199,10 @@ class ResolutionEnv:
         Add mappings from `values`.
         """
         for k, v in values.items():
-            self.values[k] = self.resolve(v)
+            if k in self.values and isinstance(self.values[k], dict):
+                self.values[k].update(self.resolve(v))
+            else:
+                self.values[k] = self.resolve(v)
 
 
 verbosity_level = 0
