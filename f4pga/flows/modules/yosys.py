@@ -75,6 +75,9 @@ class YosysModule(Module):
         if ctx.values.extra_args is not None:
             extra_args.extend(ctx.values.extra_args)
 
+        verilog_files = filter(lambda f: f.endswith('.v'), ctx.takes.sources)
+        rtlil_files = filter(lambda f: f.endswith('il'), ctx.takes.sources)
+
         common_sub(
             *(
                 ["yosys"]
@@ -82,7 +85,8 @@ class YosysModule(Module):
                 + [
                     "-p",
                     (
-                        " ".join([f"read_verilog {args_str} {vfile};" for vfile in ctx.takes.sources])
+                        " ".join([f"read_verilog {args_str} {vfile}; " for vfile in verilog_files])
+                        + " ".join([f"read_rtlil {file}; " for file in rtlil_files])
                         + f" tcl {str(get_tcl_wrapper_path(pnrtool=self.pnrtool))}"
                     ),
                 ]
