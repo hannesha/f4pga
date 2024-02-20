@@ -75,8 +75,21 @@ class YosysModule(Module):
         if ctx.values.extra_args is not None:
             extra_args.extend(ctx.values.extra_args)
 
-        verilog_files = filter(lambda f: f.endswith('.v'), ctx.takes.sources)
-        rtlil_files = filter(lambda f: f.endswith('il'), ctx.takes.sources)
+        source_paths = [Path(f) for f in ctx.takes.sources]
+
+        def is_verilog(f: Path):
+            ext = f.suffix.lower()
+            verilog_extensions = [".v", ".sv"]
+            return ext in verilog_extensions
+
+        verilog_files = filter(is_verilog, source_paths)
+
+        def is_rtlil(f: Path):
+            ext = f.suffix.lower()
+            rtlil_extensions = [".il", ".rtlil"]
+            return ext in rtlil_extensions
+
+        rtlil_files = filter(is_rtlil, source_paths)
 
         common_sub(
             *(
